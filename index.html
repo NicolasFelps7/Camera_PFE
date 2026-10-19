@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Capturador Analítico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><path d="M5 11a3 3 0 0 1 3-3h2.5l1.6-2.4A2 2 0 0 1 13.8 4.7h4.4a2 2 0 0 1 1.7.9L21.5 8H24a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3Z" fill="currentColor"/><circle cx="16" cy="16.5" r="5" fill="#fff"/><circle cx="16" cy="16.5" r="2.4" fill="currentColor"/></svg>
+      </span>
+      <div>
+        <h1>Capturador Analítico</h1>
+        <p>Filtro visual e carimbo de dados direto no Canvas</p>
+      </div>
+    </div>
+
+    <div class="status" id="status" data-state="off" role="status" aria-live="polite">
+      <span class="status-dot"></span>
+      <span id="statusText">Câmera desligada</span>
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <!-- Visor + controles -->
+    <section class="stage" aria-label="Visor da câmera">
+      <div class="bezel">
+        <div class="viewfinder" id="viewfinder">
+          <video id="video" autoplay playsinline muted></video>
+
+          <div class="idle" id="idle">
+            <svg viewBox="0 0 48 48" aria-hidden="true">
+              <path d="M8 16h6l3-5h14l3 5h6a2 2 0 0 1 2 2v18a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V18a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>
+              <circle cx="24" cy="27" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/>
+              <path d="M6 40 42 8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+            </svg>
+            <p>A câmera está desligada</p>
+            <span>Use o botão <strong>Ligar câmera</strong> para começar</span>
+          </div>
+
+          <span class="corner tl"></span><span class="corner tr"></span>
+          <span class="corner bl"></span><span class="corner br"></span>
+
+          <div class="hud top" id="hudTop" hidden>
+            <span class="hud-live"><i></i> Ao vivo</span>
+            <span class="hud-filter" id="hudFilter">Original</span>
+          </div>
+
+          <div class="hud bottom" id="hudBottom" hidden>
+            <span class="hud-name" id="hudName">Aluno não informado</span>
+            <span class="hud-clock" id="clock">--/--/---- --:--:--</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <!-- Botão único: liga e desliga -->
+        <button class="btn btn-power" id="btnPower" type="button" data-state="off" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/><path d="M6.4 6.9a8 8 0 1 0 11.2 0" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>
+          <span id="powerLabel">Ligar câmera</span>
+        </button>
+
+        <button class="btn btn-capture" id="btnCapture" type="button" disabled>
+          <span class="shutter" aria-hidden="true"></span>
+          Capturar foto
+        </button>
+      </div>
+    </section>
+
+    <!-- Painel -->
+    <aside class="panel" aria-label="Configurações da captura">
+      <div class="field">
+        <label for="studentName">Nome do aluno</label>
+        <input id="studentName" type="text" placeholder="Ex.: Maria Silva" maxlength="40" autocomplete="name">
+        <small>Esse nome é impresso sobre a foto.</small>
+      </div>
+
+      <fieldset class="field">
+        <legend>Filtro visual</legend>
+        <div class="filters" id="filters">
+          <label class="chip">
+            <input type="radio" name="filter" value="none" data-label="Original" checked>
+            <span class="swatch s-none"></span><b>Original</b>
+          </label>
+          <label class="chip">
+            <input type="radio" name="filter" value="sepia(1)" data-label="Sépia">
+            <span class="swatch s-sepia"></span><b>Sépia</b>
+          </label>
+          <label class="chip">
+            <input type="radio" name="filter" value="grayscale(1)" data-label="Preto e branco">
+            <span class="swatch s-gray"></span><b>Preto e branco</b>
+          </label>
+          <label class="chip">
+            <input type="radio" name="filter" value="invert(1)" data-label="Invertido">
+            <span class="swatch s-invert"></span><b>Invertido</b>
+          </label>
+          <label class="chip">
+            <input type="radio" name="filter" value="contrast(1.35) saturate(1.5)" data-label="Vívido">
+            <span class="swatch s-vivid"></span><b>Vívido</b>
+          </label>
+          <label class="chip">
+            <input type="radio" name="filter" value="hue-rotate(180deg) saturate(1.3)" data-label="Neon">
+            <span class="swatch s-hue"></span><b>Neon</b>
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="tip">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-4 12.7V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.3A7 7 0 0 0 12 2Zm-2 18h4v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1Z" fill="currentColor"/></svg>
+        <p>Ao desligar, cada <em>track</em> do stream recebe <code>.stop()</code>. O hardware é liberado e a luz da câmera apaga.</p>
+      </div>
+    </aside>
+
+    <!-- Resultado -->
+    <section class="result" aria-label="Foto capturada">
+      <div class="result-main">
+        <div class="result-head">
+          <h2>Foto capturada</h2>
+          <button class="btn btn-ghost" id="btnDownload" type="button" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v10m0 0-4-4m4 4 4-4M5 19h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+            Baixar PNG
+          </button>
+        </div>
+
+        <div class="photo-frame">
+          <canvas id="canvas" width="1280" height="720" aria-label="Foto capturada com filtro, nome e data"></canvas>
+          <div class="empty" id="empty">
+            <p>Nenhuma foto ainda</p>
+            <span>Ligue a câmera, escolha um filtro e capture.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-side">
+        <div class="gallery-head">
+          <h3>Histórico da sessão</h3>
+          <span id="count">0 fotos</span>
+        </div>
+        <ul class="gallery" id="gallery"></ul>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="toast" id="toast" role="alert" hidden></div>
+
+  <footer class="footer">Feito com Canvas API · <code>context.filter</code> · <code>context.fillText()</code> · <code>track.stop()</code></footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
